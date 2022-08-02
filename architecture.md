@@ -29,3 +29,38 @@
 - In prod mode, files in pub/static will reflect the state of your codebase at last deploy
 - To deploy static files to **dev**: `bin/magento dev:source-theme:deploy`
 - To deploy static files to **prod**: `bin/magento setup:static-content:deploy`
+
+## Modules
+
+### Module Names
+The location of a given module will be: `app/code/YourVendorName/YourModule`. 
+A module with this file path will have the name `YourVendorName_YourModule`. 
+Modules in the vendor/ directory will follow a bit of a different convention. 
+This will mainly come up when looking for Magento files.
+
+ex: `Magento/Catalog` => `vendor/magento/module-catalog`
+
+### Module File Structure
+- **registration.php** - Boilerplate that tells Magento it can use this modules
+- **composer.json** - Necessary if module will be installed through composer. Tells composer how to find your module.
+- **etc/** 
+  - **module.xml** - Adds your module to the list of usable modules in the project, by including a module node with a name value of the fully qualified module name. If the module depends on other modules, you can also add a sequence node to list those modules. *In the future, this may be replaced by composer.json*
+
+At a bare minimum, a module just needs registration.php and etc/module.xml. That will register the module with your app, but it will have no functionality.
+
+To install modules to the db: `bin/magento setup:upgrade`
+To enable a module: `bin/magento module:[enable/disable] YourVendorName_YourModule`
+
+### When should I use a custom module?
+- If you need view models for a new theme
+- If you are adding a larger new feature
+- If you are modifying a 3rd party module
+- If you are making customizations to an existing module
+
+### Using composer.json 
+- Composer package types:
+  - *magento2-module* - for modules in `app/code`
+  - *magento2-theme* - for theme modules in `app/design/[frontend/adminhtml]`
+  - *magento2-language* - for i18n packages
+  - *magento2-component* - relates to `vendor/magento/magento2-base`
+  - *magento2-library* - relates to core framework `vendor/magento/framework`
