@@ -45,6 +45,7 @@ ex: `Magento/Catalog` => `vendor/magento/module-catalog`
 - **composer.json** - Necessary if module will be installed through composer. Tells composer how to find your module.
 - **etc/** 
   - **module.xml** - Adds your module to the list of usable modules in the project, by including a module node with a name value of the fully qualified module name. If the module depends on other modules, you can also add a sequence node to list those modules. *In the future, this may be replaced by composer.json*
+  - **di.xml** - DI = dependency injection; tells magento if some files/modules/etc should be replaced by other versions
 
 At a bare minimum, a module just needs registration.php and etc/module.xml. That will register the module with your app, but it will have no functionality.
 
@@ -64,3 +65,41 @@ To enable a module: `bin/magento module:[enable/disable] YourVendorName_YourModu
   - *magento2-language* - for i18n packages
   - *magento2-component* - relates to `vendor/magento/magento2-base`
   - *magento2-library* - relates to core framework `vendor/magento/framework`
+
+## Dependency Injection
+### Using di.xml
+**Dependency Injection (generally)** - Adding a class you need via your class's `__construct()` method instead of instantiating a `new` instance of it.
+
+Similarly, di.xml lets you tell Magento what classes you need so it can give them to you.
+
+In practice, it looks like this:
+- `<preference>` lets you substitute one class for another
+- `<virtualType>` lets you create a new class
+
+### Factory Classes
+By default, when you inject a class in `__construct()` Magento will inject one saved instance of this class. If another class is also injecting that same class it will receive the same instance.
+
+You can get around this with a factory class. Instead of requesting `ClassName` you will request `ClassNameFactory`. 
+When you need an instance of class name you will create one like `$instance = $this->classNameFactory->create()`
+
+Magento will create Factory classes for you, automatically (in `generated/`), even for user defined classes. 
+Each factory class has one method, `create()`, which returns a unique instance of the class.
+
+### Injecting a class vs injecting its factory
+If the object "has state" (i.e. has unique data that only applies to a given instance) ues a factory.
+
+Ex1: A Product object will have a unique name/price/sku etc. This has state and should be created with a factory.
+
+Ex2: A resource model just interacts with a db. There's nothing unique about one instance vs another, so it does not have state and can be injected as a singelton
+
+
+### Object Manager
+The object manager is part of the Magento core code that manages an array of all currently existing objects within an app. 
+When you request an object type, it checks if that type is already in the array.
+If not, it creates it and adds it to the array. The object also checks for any
+preferences defined in di.xml. The OM will also check if any plugins are defined in di.xml
+and, if so, will auto-generate the necessary `\Interceptor` 
+
+You will rarely explicitly call the object manager (and if you do, you should NEVER do so in a .phtml file)
+
+
