@@ -22,11 +22,12 @@
     - `setProduct()` - Defines which product attributes are available
   - Cart layout is defined in`Magento/Checkout/view/frontend/layout/checkout_cart_item_renderers.xml`
   - There are several product types to be aware of
-    - simple product - think a single item
+    - simple product - think a single item. Mapped 1:1 with a product on the merchant's shelves
     - configurable product - has two parts:
       - configurable sku (the parent, i.e. T-shirt)
       - selected sku (the child, i.e. XL Blue T-shirt)
     - Bundle - a group of items; has one bundle sku, and a sku for each item in bundle
+    - virtual - Similar to a simple product, but intangible so it cannot map 1:1 with physical inventory
 - **Shipping Address** - Fields to enter zip code/shipping address, triggers a shipping cost calculation
   - Represented by `Magento\Quote\Model\Quote\Address` (as is Billing address). This class hold items to be delivered and also collects shipping rates
 - **Discounts** - Field to add promo codes. Managed by *promo rules* in admin panel
